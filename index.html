@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquel Nap ZzZz - (Sincronizado)</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&display=swap');
+
+        :root {
+            --color-principal: #e84393; /* Rosa Intenso */
+            --color-secundario: #9b59b6; /* Morado */
+            --color-fondo-oscuro: #0a0110;
+            --beat-duration: 0.714s; /* 60s / 84 BPM */
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ecf0f1;
+            background: linear-gradient(-45deg, var(--color-fondo-oscuro), #341a4a, var(--color-principal), var(--color-fondo-oscuro));
+            background-size: 400% 400%;
+            animation: gradientBG 25s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- Overlay de Bienvenida --- */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; 
+            backdrop-filter: blur(8px); 
+            opacity: 1;
+            transition: opacity 1s ease-out, backdrop-filter 1s ease-out; 
+        }
+
+        #intro-overlay.hidden {
+            opacity: 0;
+            pointer-events: none; 
+            backdrop-filter: blur(0px);
+        }
+
+        #intro-overlay h3 {
+            font-size: 3.5em;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px var(--color-principal);
+            animation: textGlow 2s ease-in-out infinite alternate; 
+        }
+
+        #intro-button {
+            padding: 15px 40px;
+            font-size: 1.8em;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: var(--color-principal);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--color-principal);
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        #intro-button:hover {
+            background: #ff6bcc; 
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--color-principal);
+        }
+
+        /* --- INICIO: NUEVOS ESTILOS PARA EL OVERLAY DE MENSAJE --- */
+
+        #message-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* Un poco más alto que el intro, por si acaso */
+            backdrop-filter: blur(8px); 
+            opacity: 1;
+            transition: opacity 1s ease-out, backdrop-filter 1s ease-out; 
+        }
+
+        #message-overlay.hidden {
+            opacity: 0;
+            pointer-events: none; 
+            backdrop-filter: blur(0px);
+        }
+
+        .message-content {
+            background: rgba(10, 1, 16, 0.9); /* Fondo oscuro casi opaco */
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--color-principal);
+            box-shadow: 0 0 30px var(--color-principal);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            animation: fadeInPage 1s ease-out; /* Reutilizamos la animación de entrada */
+        }
+
+        .message-content h3 {
+            font-size: 2.5em;
+            color: var(--color-principal);
+            margin-top: 0;
+            text-shadow: 0 0 15px var(--color-principal);
+        }
+
+        .message-content p {
+            font-size: 1.2em;
+            line-height: 1.7;
+            color: #ecf0f1;
+        }
+
+        #close-message-button {
+            padding: 10px 30px;
+            font-size: 1.1em;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: var(--color-secundario); /* Botón morado */
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--color-secundario);
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        #close-message-button:hover {
+            background: #b370d4;
+            transform: scale(1.05);
+        }
+
+        /* --- FIN: NUEVOS ESTILOS PARA EL OVERLAY DE MENSAJE --- */
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 25px;
+            box-shadow: 0 0 50px rgba(var(--color-principal), 0.5);
+            animation: fadeInPage 1.5s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 3px solid var(--color-secundario);
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        header {
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin: 0;
+            font-weight: 900;
+            color: white;
+            animation: textGlow 2.5s ease-in-out infinite alternate, 
+                         heartbeat var(--beat-duration) infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1.0); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1.0); }
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 5px white, 0 0 10px var(--color-secundario); }
+            to { text-shadow: 0 0 15px white, 0 0 25px var(--color-principal); }
+        }
+
+        h2 {
+            font-size: 1.6em;
+            font-weight: 400;
+            color: var(--color-principal);
+            margin: 5px 0 0;
+            letter-spacing: 2px;
+        }
+
+        @keyframes sync-glow {
+            0%, 100% {
+                color: var(--color-secundario);
+                text-shadow: none;
+            }
+            50% { 
+                color: #ffffff;
+                text-shadow: 0 0 8px white, 0 0 15px var(--color-principal);
+            }
+        }
+
+
+        .lyrics p {
+            font-size: 1.3em;
+            line-height: 1.9;
+            margin-bottom: 25px;
+            color: var(--color-secundario);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            opacity: 0; 
+
+            animation-name: slideIn, sync-glow;
+            animation-duration: 0.7s, var(--beat-duration);
+            animation-timing-function: ease-out, ease-in-out;
+            animation-fill-mode: forwards, none;
+            animation-iteration-count: 1, infinite;
+        }
+        
+        .lyrics p:hover {
+            transform: scale(1.05); 
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .audio-wave {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+            margin-top: 15px;
+        }
+
+        .bar {
+            width: 5px;
+            height: 5px;
+            background: var(--color-principal);
+            margin: 0 2px;
+            border-radius: 2px;
+            animation: wave var(--beat-duration) infinite ease-in-out alternate;
+        }
+
+        .bar:nth-child(2) { animation-delay: calc(var(--beat-duration) * -0.1); background: var(--color-secundario); }
+        .bar:nth-child(3) { animation-delay: calc(var(--beat-duration) * -0.2); }
+        .bar:nth-child(4) { animation-delay: calc(var(--beat-duration) * -0.3); background: var(--color-secundario); }
+        .bar:nth-child(5) { animation-delay: calc(var(--beat-duration) * -0.4); }
+        .bar:nth-child(6) { animation-delay: calc(var(--beat-duration) * -0.3); background: var(--color-secundario); }
+        .bar:nth-child(7) { animation-delay: calc(var(--beat-duration) * -0.2); }
+        .bar:nth-child(8) { animation-delay: calc(var(--beat-duration) * -0.1); background: var(--color-secundario); }
+        .bar:nth-child(9) { animation-delay: calc(var(--beat-duration) * 0); }
+
+        @keyframes wave {
+            0% { height: 5px; transform: translateY(0); }
+            100% { height: 35px; transform: translateY(-15px); }
+        }
+
+        /* --- INICIO: NUEVO ESTILO PARA EL BOTÓN DE MENSAJE --- */
+        #message-button {
+            padding: 12px 30px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: var(--color-secundario); /* Botón morado */
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--color-secundario);
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            margin-top: 30px; /* Espacio para separarlo de la letra */
+        }
+
+        #message-button:hover {
+            background: #b370d4; /* Morado más claro */
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--color-secundario);
+        }
+        /* --- FIN: NUEVO ESTILO PARA EL BOTÓN DE MENSAJE --- */
+
+    </style>
+</head>
+<body>
+
+    
+<div id="intro-overlay">
+        <h3>Para la chica más linda del mundo ❤️</h3>
+        <button id="intro-button">De M.A.V.C</button>
+</div>
+
+<div id="message-overlay" class="hidden">
+    <div class="message-content">
+        <h3>Un Mensaje Especial...</h3>
+        
+        <p>
+            Hola mi Reina,
+            <br><br>
+            Estoy sorprendido con todo lo que lograste en este tiempo... 
+            <br><br>
+            Talvez sea egoista por querer que estes solo conmigo... <br> Lo siento si hice las cosas mal espero te vaya bien y estes bien... <br> <br> Para mi siempre seras mi Reina, Niña y el amor de mi vida...
+        </p>
+        <button id="close-message-button">Cerrar</button>
+    </div>
+</div>
+<audio loop id="musica-fondo">
+    <source src="Rauw Alejandro - Aquel Nap ZzZz (Audio Oficial) - Rauw Alejandro.mp3" type="audio/mpeg">
+    Tu navegador no soporta el elemento de audio.
+</audio>
+
+<div class="container">
+    <header>
+        <h3>Para una </h3>
+        <h1>Reina</h1>
+        <h2>Aquel Nap Zzz</h2>
+        
+        <div class="audio-wave">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </header>
+    
+    <section class="lyrics">
+        <p>Tu dormida encima de mi</p>
+        <p>La brisa viene del mar</p>
+        <p>No te dejo de mirar</p>
+        <p>Eres mi niña de cristal</p>
+        <p>Juro que yo mato por ti</p>
+        <p>Aunque se que sabes cuidarte sola</p>
+        <p>Quisiera detener la hora</p>
+        <p>Pero el tiempo se va como las olas</p>
+        <p>Toda mi tristeza te llevaste</p>
+        <p>Con un beso tuyo me calmaste</p>
+        <p>Yo te navegue y me dejaste</p>
+        <p>¿Como llegamos aquí?</p>
+        <p>Solo el deseo lo sabe</p>
+        <p>Todo el tiempo que te tengo cerca</p>
+        <p>No quiero que se acabe</p>
+        <p>Si esto fuera un error</p>
+        <p>Volvería equivocarme</p>
+        <p>De tu cora’ no quiero mudarme</p>
+        <p>Yo te cuido y tu me cuidas, nena</p>
+        <p>Aunque se vaya el sol</p>
+        <p>Contigo el día nunca acaba</p>
+        <p>Dale acaba y llega</p>
+        <p>Pa’ comerte la cara</p>
+        <p>El joseo to’ los días hasta la madrugada</p>
+        <p>Pa’ llevarte a Tokyo y que nunca te falte nada</p>
+        <p>Tu mi 24 de diciembre</p>
+        <p>Estas ganas no se acaban, son por siempre</p>
+        <p>Fuck el pasado</p>
+        <p>Solo importa tu presente</p>
+        <p>Aun siento mariposas cuando te tengo de frente</p>
+        <p>Mami, tu brillas sin luz</p>
+        <p>Estoy loco que se acabe el tour</p>
+        <p>Pa’ llegar y hacerte un par de mini tu</p>
+        <p>Te tengo como 100 canciones en el Stu</p>
+        <p>Y lo sabes tu</p>
+        <p>Que pa’ ti no hay excusa</p>
+        <p>Mi boca esta llena del Mac que tu usas</p>
+        <p>Cuando te vistes pa’ salir tu siempre abusas</p>
+        <p>Tu trajecito Prada va con mi medusa</p>
+        <p>Tu dormida encima de mi</p>
+        <p>Tu dormida encima de mi</p>
+        <p>La brisa viene del mar</p>
+        <p>No te dejo de mirar</p>
+        <p>Eres mi niña de cristal</p>
+        <p>Juro que yo mato por ti</p>
+        <p>Aunque se que sabes cuidarte sola</p>
+        <p>Quisiera detener la hora</p>
+        <p>Pero el tiempo se va como las olas</p>
+        <p>Toda mi tristeza te llevaste</p>
+        <p>Con un beso tuyo me calmaste</p>
+        <p>Yo te navegue y me dejaste</p>
+        <p>¿Como llegamos aquí?</p>
+        <p>Solo el deseo lo sabe</p>
+        <p>Toda mi tristeza te llevaste</p> 
+        <p>Todo el tiempo que te tengo cerca</p>
+        <p>No quiero que se acabe</p>
+        <p>Si esto fuera un error</p>
+        <p>Volvería equivocarme</p>
+        <p>De cora’ no quiero mudarme</p>
+        <p>Yo te cuido y tu me cuidas, nena</p>
+        <p>Yo te cuido y tu me cuidas, nena…</p>
+        <p>Yo te cuido y te me cuidas, nena…</p>
+        <p>Noche te me fuiste</p>
+        <p>¿Por que no te quedaste con nosotros?</p>
+        <p>Como prometiste aquella luna</p>
+        <p>Noche te me fuiste….</p>
+        <p>Si yo</p>
+        <p>Si yo….</p>
+        <p>Solo quiero contigo</p>
+        <p>No quiero a nadie mas</p>
+        <p>A nadie mas…</p>
+        <p>Quiero que seas tu</p>
+        <p>Que seas tu….</p>
+    </section>
+
+    <button id="message-button">Mensaje</button>
+    </div>
+
+<script>
+    document.getElementById('intro-button').addEventListener('click', function() {
+        var overlay = document.getElementById('intro-overlay');
+        var audio = document.getElementById('musica-fondo');
+        
+        overlay.classList.add('hidden'); 
+        audio.play(); 
+
+        overlay.addEventListener('transitionend', function() {
+            overlay.remove();
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- Código para animar las letras ---
+        var lyricLines = document.querySelectorAll('.lyrics p');
+        var baseDelay = 1.0; 
+        var increment = 0.2; 
+
+        lyricLines.forEach(function(line, index) {
+            var delay = baseDelay + (index * increment);
+            line.style.animationDelay = delay + 's';
+        });
+
+        
+        // --- INICIO: NUEVO JS PARA EL MENSAJE ---
+
+        // 1. Seleccionar los elementos
+        var openButton = document.getElementById('message-button');
+        var closeButton = document.getElementById('close-message-button');
+        var messageOverlay = document.getElementById('message-overlay');
+
+        // 2. Evento para ABRIR el mensaje
+        openButton.addEventListener('click', function() {
+            messageOverlay.classList.remove('hidden');
+        });
+
+        // 3. Evento para CERRAR el mensaje
+        closeButton.addEventListener('click', function() {
+            messageOverlay.classList.add('hidden');
+        });
+
+        // --- FIN: NUEVO JS PARA EL MENSAJE ---
+    });
+</script>
+
+</body>
+</html>
